@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import pickle
-import joblib
 # Explicabilité
 import lime
 from lime import lime_tabular
@@ -23,10 +22,9 @@ import json
 # Créer l'objet app
 app = FastAPI()
 
-# Modèle XGBoost
-#pickle_in = open("classifier.pkl", "rb")
-#model = pickle.load(pickle_in)
-model = joblib.load("classifier.pkl")
+# Modèle gradient boosting classifier
+pickle_in = open("classifier.pkl", "rb")
+model = pickle.load(pickle_in)
 
 # Données utilisées pour entraîner le modèle
 pickle_in = open("train_set.pkl", "rb")
@@ -36,13 +34,6 @@ data_train = pickle.load(pickle_in)
 pickle_in = open("test_set.pkl", "rb")
 data_test = pickle.load(pickle_in)
 
-explainer = lime_tabular.LimeTabularExplainer(
-    training_data = np.array(data_train.drop(['SK_ID_CURR', 'TARGET'], axis = 1)),
-    feature_names = data_train.drop(['SK_ID_CURR', 'TARGET'], axis =1).columns,
-    class_names = [0, 1],
-    mode = 'classification')
-
-
 # http://127.0.0.1:8000
 @app.get('/')
 def index():
@@ -50,6 +41,9 @@ def index():
 
 class Client(BaseModel):
     client_id: int  
+
+        
+### id pour test : 379761 ###
 
 # Informations client
 @app.post('/show')
@@ -63,8 +57,6 @@ def client_informations(idt_test:Client):
 
     return client_test
 
-### id pour test : 379761 ###
-
 # Prédictions
 @app.post('/predict_proba')
 def default_prediction(idt_test:Client):
@@ -74,22 +66,13 @@ def default_prediction(idt_test:Client):
     
     # Prediction pour un client donné
     prediction = model.predict_proba(client_test)[0][1]
-    #prediction = prediction.to_list()
-    #prediction = model.predict_proba([list(client_test.__dict__.values())])
-
     return {'predict_proba' : prediction}
 
-#@app.post('/predict_proba')
-#def default_prediction(itemClient:Client):
-    #client = itemClient.dict()
-    #client_id = client['client_id']
-    #try:
-        #client_data = data_test.loc[data_test['SK_ID_CURR'] == client_id].drop(['SK_ID_CURR', 'TARGET'], axis = 1)
-        #prediction = model.predict_proba(client_data)
-        #output_val = {'probability':round(prediction_proba[0].max(),2)}
-        #return output_val
-    #except:
-        #return ("Client Not found")
+explainer = lime_tabular.LimeTabularExplainer(
+    training_data = np.array(data_train.drop(['SK_ID_CURR', 'TARGET'], axis = 1)),
+    feature_names = data_train.drop(['SK_ID_CURR', 'TARGET'], axis =1).columns,
+    class_names = [0, 1],
+    mode = 'classification')
 
 @app.post('/explain')
 def explain_feature(idt_test:Client):
