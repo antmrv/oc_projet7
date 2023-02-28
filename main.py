@@ -68,7 +68,7 @@ def default_prediction(idt_test:Client):
     prediction = model.predict_proba(client_test)[0][1]
     return {'predict_proba' : prediction}
 
-explainer = lime_tabular.LimeTabularExplainer(
+explainer = lime_tabular.LimeTabularExplainer(random_state = 42,
     training_data = np.array(data_train.drop(['SK_ID_CURR', 'TARGET'], axis = 1)),
     feature_names = data_train.drop(['SK_ID_CURR', 'TARGET'], axis =1).columns,
     class_names = [0, 1],
