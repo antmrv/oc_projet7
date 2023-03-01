@@ -40,9 +40,9 @@ def main():
     Configure les differents ports de l'API
     Cree une liste deroulante pour chosir l'application utilise
     """
-    FastAPI_URI_pred = "http://127.0.0.1:8000/predict_proba"
-    FastAPI_URI_show = "http://127.0.0.1:8000/show"
-    FastAPI_URI_explain = "http://127.0.0.1:8000/explain"
+    FastAPI_URI_pred = "https://amprojet7.herokuapp.com/predict_proba"
+    FastAPI_URI_show = "https://amprojet7.herokuapp.com/show"
+    FastAPI_URI_explain = "https://amprojet7.herokuapp.com/explain"
 
     st.title("Informations du client")
     
